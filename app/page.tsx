@@ -28,7 +28,7 @@ export default function GatePage() {
       setRevealed(true);
       return;
     }
-    const t = setTimeout(() => setRevealed(true), 2400);
+    const t = setTimeout(() => setRevealed(true), 1400);
     return () => clearTimeout(t);
   }, [reduceMotion]);
 
@@ -101,6 +101,15 @@ export default function GatePage() {
         </Link>
       </div>
 
+      {/* Soft vignette directly behind the title, so it reads over any frame */}
+      <div
+        className="pointer-events-none absolute inset-0 z-[5]"
+        style={{
+          background:
+            "radial-gradient(60% 45% at 50% 48%, rgba(23,19,16,0.55) 0%, rgba(23,19,16,0.28) 45%, rgba(23,19,16,0) 75%)",
+        }}
+      />
+
       {/* Center: title + invitation */}
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center">
         <motion.h1
@@ -111,7 +120,7 @@ export default function GatePage() {
               : { opacity: 0, y: 24, filter: "blur(8px)" }
           }
           transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-          className="font-display text-[clamp(3.75rem,17vw,15rem)] leading-none text-cream drop-shadow-[0_4px_30px_rgba(0,0,0,0.55)]"
+          className="font-display uppercase leading-[0.9] text-[clamp(3.25rem,15vw,14rem)] tracking-[0.02em] text-[#f5c63c] drop-shadow-[0_3px_24px_rgba(0,0,0,0.85)]"
         >
           Dandyland
         </motion.h1>
@@ -119,21 +128,21 @@ export default function GatePage() {
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 16 }}
           animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: reduceMotion ? 0 : 0.9 }}
-          className="mt-6"
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: reduceMotion ? 0 : 0.6 }}
+          className="mt-8"
         >
           <Link
             href="/garden"
             className="group inline-flex flex-col items-center gap-3"
             aria-label="Take a walk through the garden"
           >
-            <span className="font-display text-[clamp(1.15rem,3.4vw,2rem)] text-cream/90 transition-colors group-hover:text-bloomgold">
+            <span className="font-display text-[clamp(1.25rem,3.6vw,2.15rem)] text-cream drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] transition-colors group-hover:text-[#f5c63c]">
               Take A Walk Through The Garden
             </span>
-            <span className="relative flex h-9 w-9 items-center justify-center rounded-full border border-cream/40 text-cream/80 transition-colors group-hover:border-bloomgold group-hover:text-bloomgold">
+            <span className="relative flex h-10 w-10 items-center justify-center rounded-full border border-cream/60 text-cream transition-colors group-hover:border-[#f5c63c] group-hover:text-[#f5c63c]">
               <motion.svg
-                width="16"
-                height="16"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
