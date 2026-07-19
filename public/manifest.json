@@ -1,27 +1,31 @@
 {
-  "name": "The Garden - Dan Dutton",
-  "short_name": "The Garden",
-  "description": "An immersive gallery of flower paintings by Kentucky folk artist Dan Dutton",
-  "start_url": "/",
+  "name": "Dandyland — Dan Dutton",
+  "short_name": "Dandyland",
+  "description": "The imaginative country of Kentucky artist Dan Dutton — paintings, ballads, stage works, sculpture, and the land where they are made.",
+  "start_url": "/studio",
   "display": "standalone",
-  "background_color": "#FBF7F0",
-  "theme_color": "#FBF7F0",
-  "orientation": "portrait-primary",
+  "background_color": "#241a12",
+  "theme_color": "#241a12",
+  "orientation": "any",
   "icons": [
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "categories": ["art", "entertainment", "lifestyle"],
-  "screenshots": []
+  "categories": ["art", "entertainment", "lifestyle"]
 }
-

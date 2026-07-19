@@ -1,159 +1,160 @@
-'use client';
+"use client";
 
-import InteractiveFlower from '@/components/interactive-flower';
-import BloomHero from '@/components/bloom-hero';
-import WildButterflies from '@/components/wild-butterflies';
-import WildPetals from '@/components/wild-petals';
-import WildSparkles from '@/components/wild-sparkles';
-import Link from 'next/link';
-import { getRandomFlowers } from '@/lib/utils';
-import { useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
-import { useTheme } from '@/contexts/theme-context';
+/**
+ * Stage One — The Gate.
+ *
+ * A full-viewport looping film of Dandyland. The moving image shows first;
+ * after a beat the title arrives, then the invitation to walk through the
+ * garden. Two quiet controls sit at the edges: sound, and a shortcut into
+ * the studio for returning visitors. No global chrome here (see SiteChrome).
+ */
 
-export default function Home() {
-  const flowerImages = useMemo(() => getRandomFlowers(20), []);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const { isWild } = useTheme();
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { useSound } from "@/contexts/sound-context";
+
+export default function GatePage() {
+  const reduceMotion = useReducedMotion();
+  const { soundOn, toggleSound } = useSound();
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const [revealed, setRevealed] = useState(false);
+  const [journeyed, setJourneyed] = useState(false);
+
+  // Reveal the title/invitation after the film has established itself.
+  useEffect(() => {
+    if (reduceMotion) {
+      setRevealed(true);
+      return;
+    }
+    const t = setTimeout(() => setRevealed(true), 2400);
+    return () => clearTimeout(t);
+  }, [reduceMotion]);
+
+  // Note returning visitors who have completed the walk before.
+  useEffect(() => {
+    try {
+      setJourneyed(localStorage.getItem("dandyland-journeyed") === "true");
+    } catch {
+      /* storage unavailable — treat as first visit */
+    }
+  }, []);
+
+  // Keep the video element's muted state in sync with the global preference.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !soundOn;
+    if (soundOn) v.play().catch(() => {});
+  }, [soundOn]);
 
   return (
-    <div className="relative min-h-screen bloom-cursor paint-texture overflow-hidden">
-      {/* WILD GARDEN ANIMATIONS - Only show in wild theme */}
-      {isWild && (
-        <>
-          <WildPetals />
-          <WildButterflies />
-          <WildSparkles />
-        </>
-      )}
-      
-      <BloomHero />
-      
-      {/* Interactive Garden */}
-      <section className="relative min-h-screen pt-32">
-        {isWild ? (
-          <>
-            <div className="absolute inset-0 bg-gradient-to-br from-garden-lime/5 via-garden-cyan/5 to-garden-magenta/5 animate-pulse" />
-            <motion.div 
-              className="absolute inset-0 bg-gradient-to-tr from-garden-coral/10 via-transparent to-garden-violet/10"
-              animate={{
-                opacity: [0.2, 0.4, 0.2],
-                scale: [1, 1.1, 1],
-              }}
-              transition={{
-                duration: 8,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            />
-          </>
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-b from-garden-cream via-garden-moss/5 to-garden-violet/10" />
-        )}
-        
-        <div className="relative w-full h-[200vh] overflow-hidden">
-          {flowerImages.map((image, index) => (
-            <InteractiveFlower
-              key={image}
-              imagePath={image}
-              index={index}
-              totalFlowers={flowerImages.length}
-              onClick={() => setSelectedImage(image)}
-            />
-          ))}
-        </div>
-      </section>
+    <section
+      aria-label="Dandyland — enter"
+      className="relative h-[100svh] w-full overflow-hidden bg-aged"
+    >
+      {/* The film */}
+      <video
+        ref={videoRef}
+        className="absolute inset-0 h-full w-full object-cover"
+        poster="/videos/poster.jpg"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-hidden="true"
+      >
+        <source src="/videos/dandyland-intro.mp4" type="video/mp4" />
+      </video>
 
-      {/* Introduction Section */}
-      <section className={`relative py-32 px-6 ${isWild ? 'bg-gradient-to-b from-transparent to-garden-midnight/50' : 'bg-gradient-to-b from-garden-violet/10 to-garden-cream'}`}>
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl md:text-7xl font-serif text-garden-moss mb-8">
-            Enter the Garden
-          </h2>
-          <p className="text-xl md:text-2xl text-garden-earth leading-relaxed mb-12 font-serif">
-            Experience the vibrant world of Kentucky folk artist Dan Dutton, 
-            where painting, music, and myth converge in a celebration of nature's 
-            eternal cycles of growth, bloom, and renewal.
-          </p>
-          
-          <div className="grid md:grid-cols-3 gap-8 mt-16">
-            <Link 
-              href="/gallery"
-              className="group relative overflow-hidden rounded-2xl bg-garden-moss/10 p-8 hover:bg-garden-moss/20 transition-all duration-500"
-            >
-              <h3 className="text-2xl font-serif text-garden-moss mb-4">The Beds</h3>
-              <p className="text-garden-earth">Explore the complete gallery of flower paintings</p>
-              <div className="mt-6 text-garden-violet group-hover:translate-x-2 transition-transform duration-300">→</div>
-            </Link>
-            
-            <Link 
-              href="/studio"
-              className="group relative overflow-hidden rounded-2xl bg-garden-earth/10 p-8 hover:bg-garden-earth/20 transition-all duration-500"
-            >
-              <h3 className="text-2xl font-serif text-garden-earth mb-4">The Compost</h3>
-              <p className="text-garden-earth">Writings, process, and behind-the-scenes</p>
-              <div className="mt-6 text-garden-violet group-hover:translate-x-2 transition-transform duration-300">→</div>
-            </Link>
-            
-            <Link 
-              href="/music"
-              className="group relative overflow-hidden rounded-2xl bg-garden-coral/10 p-8 hover:bg-garden-coral/20 transition-all duration-500"
-            >
-              <h3 className="text-2xl font-serif text-garden-coral mb-4">The Rain</h3>
-              <p className="text-garden-earth">Listen to Dan's musical compositions</p>
-              <div className="mt-6 text-garden-violet group-hover:translate-x-2 transition-transform duration-300">→</div>
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Tonal treatment for legibility */}
+      <div className="scrim-full pointer-events-none absolute inset-0" />
+      <div className="scrim-b pointer-events-none absolute inset-x-0 bottom-0 h-2/3" />
 
-      {/* Fullscreen Image Modal */}
-      <AnimatePresence>
-        {selectedImage && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedImage(null)}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-garden-midnight/95 backdrop-blur-md cursor-pointer p-4"
+      {/* Top edge: sound + returning-visitor shortcut */}
+      <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-5 py-5 md:px-8">
+        <button
+          type="button"
+          onClick={toggleSound}
+          aria-pressed={soundOn}
+          className="inline-flex items-center gap-2 text-[0.7rem] uppercase tracking-label text-cream/70 transition-colors hover:text-cream"
+        >
+          <span
+            className="inline-block h-1.5 w-1.5 rounded-full"
+            style={{ backgroundColor: soundOn ? "#e0a72e" : "transparent", boxShadow: soundOn ? "0 0 0 1px #e0a72e" : "0 0 0 1px rgba(244,234,212,0.5)" }}
+          />
+          {soundOn ? "Sound on" : "Sound off"}
+        </button>
+
+        <Link
+          href="/studio"
+          className={
+            "text-[0.7rem] uppercase tracking-label transition-all duration-700 " +
+            (journeyed
+              ? "text-cream/80 hover:text-bloomgold"
+              : "text-cream/45 hover:text-cream/80")
+          }
+        >
+          Enter the Studio →
+        </Link>
+      </div>
+
+      {/* Center: title + invitation */}
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center">
+        <motion.h1
+          initial={reduceMotion ? false : { opacity: 0, y: 24, filter: "blur(8px)" }}
+          animate={
+            revealed
+              ? { opacity: 1, y: 0, filter: "blur(0px)" }
+              : { opacity: 0, y: 24, filter: "blur(8px)" }
+          }
+          transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
+          className="font-display text-[clamp(3.75rem,17vw,15rem)] leading-none text-cream drop-shadow-[0_4px_30px_rgba(0,0,0,0.55)]"
+        >
+          Dandyland
+        </motion.h1>
+
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+          animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: reduceMotion ? 0 : 0.9 }}
+          className="mt-6"
+        >
+          <Link
+            href="/garden"
+            className="group inline-flex flex-col items-center gap-3"
+            aria-label="Take a walk through the garden"
           >
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0, rotate: -5 }}
-              animate={{ scale: 1, opacity: 1, rotate: 0 }}
-              exit={{ scale: 0.8, opacity: 0, rotate: 5 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="relative max-w-6xl max-h-[90vh] w-full h-full"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Image
-                src={selectedImage}
-                alt="Flower painting"
-                fill
-                sizes="90vw"
-                className="object-contain rounded-lg"
-                priority
-              />
-              <button
-                onClick={() => setSelectedImage(null)}
-                className="absolute top-4 right-4 w-12 h-12 rounded-full bg-garden-cream/90 hover:bg-garden-cream text-garden-midnight flex items-center justify-center text-2xl font-bold transition-all hover:scale-110 shadow-lg"
-                aria-label="Close"
+            <span className="font-display text-[clamp(1.15rem,3.4vw,2rem)] text-cream/90 transition-colors group-hover:text-bloomgold">
+              Take A Walk Through The Garden
+            </span>
+            <span className="relative flex h-9 w-9 items-center justify-center rounded-full border border-cream/40 text-cream/80 transition-colors group-hover:border-bloomgold group-hover:text-bloomgold">
+              <motion.svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                animate={reduceMotion ? undefined : { y: [0, 4, 0] }}
+                transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
               >
-                ×
-              </button>
-              
-              {/* Decorative frame effect */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="absolute inset-0 pointer-events-none rounded-lg border-4 border-garden-moss/20"
-              />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+                <path d="M12 5v14M6 13l6 6 6-6" />
+              </motion.svg>
+            </span>
+          </Link>
+        </motion.div>
+      </div>
+
+      {/* Corner mark */}
+      <div className="pointer-events-none absolute bottom-5 left-5 z-20 md:left-8">
+        <span className="kicker text-cream/45">Dan Dutton · Kentucky</span>
+      </div>
+    </section>
   );
 }
-

@@ -1,80 +1,93 @@
-// Service Worker for The Garden PWA
-const CACHE_NAME = 'the-garden-v1';
-const STATIC_CACHE = 'static-v1';
-const DYNAMIC_CACHE = 'dynamic-v1';
+/*
+  Dandyland service worker.
 
-// Files to cache on install
-const STATIC_ASSETS = [
-  '/',
-  '/gallery',
-  '/studio',
-  '/music',
-  '/about',
-  '/manifest.json',
-];
+  Strategy:
+  - App shell + offline page precached on install.
+  - Navigations: network-first, falling back to cache, then the offline page.
+  - Interface assets (Next static chunks, fonts): stale-while-revalidate.
+  - Large media (the hero video, full-resolution artwork) is deliberately
+    NOT cached, to respect device storage.
+  - A versioned cache name ensures returning users don't get stuck on stale
+    builds — old caches are cleared on activate.
+*/
 
-// Install event - cache static assets
-self.addEventListener('install', (event) => {
-  console.log('Service Worker: Installing...');
+const VERSION = "dandyland-v2";
+const SHELL_CACHE = `shell-${VERSION}`;
+const ASSET_CACHE = `assets-${VERSION}`;
+
+const SHELL = ["/studio", "/offline.html", "/manifest.json"];
+
+// Paths we never want to fill the cache with.
+function isLargeMedia(url) {
+  return (
+    url.pathname.startsWith("/videos/") ||
+    /\.(mp4|webm|mov)$/i.test(url.pathname)
+  );
+}
+
+self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) => {
-      console.log('Service Worker: Caching static assets');
-      return cache.addAll(STATIC_ASSETS);
-    })
+    caches.open(SHELL_CACHE).then((cache) => cache.addAll(SHELL))
   );
   self.skipWaiting();
 });
 
-// Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
-  console.log('Service Worker: Activating...');
+self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cache) => {
-          if (cache !== STATIC_CACHE && cache !== DYNAMIC_CACHE) {
-            console.log('Service Worker: Clearing old cache');
-            return caches.delete(cache);
-          }
-        })
-      );
-    })
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys
+          .filter((k) => k !== SHELL_CACHE && k !== ASSET_CACHE)
+          .map((k) => caches.delete(k))
+      )
+    )
   );
-  return self.clients.claim();
+  self.clients.claim();
 });
 
-// Fetch event - serve from cache, fallback to network
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   const { request } = event;
-  
-  // Skip cross-origin requests
-  if (!request.url.startsWith(self.location.origin)) {
+  if (request.method !== "GET") return;
+
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+  if (isLargeMedia(url)) return; // let the network handle big media
+
+  // Navigations: network-first with offline fallback.
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(SHELL_CACHE).then((c) => c.put(request, copy));
+          return res;
+        })
+        .catch(() =>
+          caches.match(request).then((r) => r || caches.match("/offline.html"))
+        )
+    );
     return;
   }
 
-  event.respondWith(
-    caches.match(request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-
-      return fetch(request).then((response) => {
-        // Don't cache non-successful responses
-        if (!response || response.status !== 200 || response.type === 'error') {
-          return response;
-        }
-
-        // Clone the response
-        const responseToCache = response.clone();
-
-        // Cache dynamic content
-        caches.open(DYNAMIC_CACHE).then((cache) => {
-          cache.put(request, responseToCache);
-        });
-
-        return response;
-      });
-    })
-  );
+  // Interface assets: stale-while-revalidate.
+  if (
+    url.pathname.startsWith("/_next/static/") ||
+    url.pathname.startsWith("/fonts/") ||
+    /\.(css|js|woff2?)$/i.test(url.pathname)
+  ) {
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        const network = fetch(request)
+          .then((res) => {
+            if (res && res.status === 200) {
+              const copy = res.clone();
+              caches.open(ASSET_CACHE).then((c) => c.put(request, copy));
+            }
+            return res;
+          })
+          .catch(() => cached);
+        return cached || network;
+      })
+    );
+  }
 });
-

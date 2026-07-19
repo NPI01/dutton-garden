@@ -1,49 +1,59 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Homemade+Apple&family=Inter:wght@300;400;500;600&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/*
+  Dandyland — global styles.
+  Fonts arrive as CSS variables from next/font (see app/fonts.ts);
+  no blocking external @import.
+*/
+
 @layer base {
   :root {
-    /* Default (Wild) colors */
-    --garden-cream: #E5E5E5;
-    --garden-moss: #00D9A3;
-    --garden-violet: #B645D6;
-    --garden-coral: #FF6B9D;
-    --garden-earth: #FFB627;
-    --garden-midnight: #0A0A0F;
+    --ground: #241a12; /* default page ground: soil */
+    --ink: #f4ead4; /* default text on dark grounds: cream */
   }
-  
-  html[data-theme="elegant"] {
-    --garden-cream: #FBF7F0;
-    --garden-moss: #7A9B76;
-    --garden-violet: #9B7BA3;
-    --garden-coral: #F4A6A3;
-    --garden-earth: #8B7355;
-    --garden-midnight: #2C3E50;
+
+  html {
+    scroll-behavior: smooth;
   }
-  
+
   body {
-    @apply font-sans antialiased;
+    @apply font-serif antialiased text-cream;
+    background-color: var(--ground);
+    text-rendering: optimizeLegibility;
   }
-  
-  /* Theme-based styling */
-  html[data-theme="wild"] body {
-    @apply bg-garden-midnight text-garden-cream;
-  }
-  
-  html[data-theme="elegant"] body {
-    @apply bg-garden-cream text-garden-midnight;
-  }
-  
-  /* Default to wild if no theme set */
-  html:not([data-theme]) body {
-    @apply bg-garden-midnight text-garden-cream;
-  }
-  
+
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif;
+    @apply font-display font-normal;
+    line-height: 1.02;
+  }
+
+  /* Tasteful, consistent focus ring for keyboard users everywhere. */
+  :focus-visible {
+    outline: 2px solid theme("colors.bloomgold");
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: theme("colors.bloomgold");
+    color: theme("colors.soil");
+  }
+}
+
+@layer components {
+  /* A quiet, letter-spaced label voice (nav, kickers, credits). */
+  .kicker {
+    @apply font-serif uppercase tracking-label text-[0.7rem] font-medium;
+  }
+
+  /* Skip link — visually hidden until focused. */
+  .skip-link {
+    @apply sr-only;
+  }
+  .skip-link:focus {
+    @apply not-sr-only fixed left-4 top-4 z-[100] rounded bg-cream px-4 py-2 text-soil no-underline;
   }
 }
 
@@ -51,138 +61,69 @@
   .text-balance {
     text-wrap: balance;
   }
-  
-  .brush-text {
-    @apply font-brush;
+  .text-pretty {
+    text-wrap: pretty;
   }
-  
-  /* THEME-BASED BACKGROUNDS */
-  html[data-theme="wild"] .paint-texture {
-    background: 
-      radial-gradient(circle at 20% 30%, rgba(198, 255, 0, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(182, 69, 214, 0.25) 0%, transparent 50%),
-      radial-gradient(circle at 40% 70%, rgba(255, 107, 157, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 90% 80%, rgba(0, 217, 163, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 60% 50%, rgba(0, 229, 255, 0.15) 0%, transparent 60%),
-      linear-gradient(135deg, 
-        #0A0A0F 0%, 
-        #1A0B2E 25%,
-        #0F0820 50%,
-        #1A0B2E 75%,
-        #0A0A0F 100%
-      );
-    animation: wildGradient 20s ease infinite;
-    background-size: 400% 400%;
+
+  /* Paper grain — a faint fibrous texture for cream/paper grounds. */
+  .grain {
+    position: relative;
   }
-  
-  html[data-theme="elegant"] .paint-texture {
-    background-image: 
-      repeating-linear-gradient(
-        90deg,
-        rgba(139, 115, 85, 0.03) 0px,
-        transparent 1px,
-        transparent 2px,
-        rgba(139, 115, 85, 0.03) 3px
-      ),
-      repeating-linear-gradient(
-        0deg,
-        rgba(139, 115, 85, 0.03) 0px,
-        transparent 1px,
-        transparent 2px,
-        rgba(139, 115, 85, 0.03) 3px
-      );
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E");
   }
-  
-  /* Default to wild */
-  html:not([data-theme]) .paint-texture {
-    background: 
-      radial-gradient(circle at 20% 30%, rgba(198, 255, 0, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(182, 69, 214, 0.25) 0%, transparent 50%),
-      radial-gradient(circle at 40% 70%, rgba(255, 107, 157, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 90% 80%, rgba(0, 217, 163, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 60% 50%, rgba(0, 229, 255, 0.15) 0%, transparent 60%),
-      linear-gradient(135deg, 
-        #0A0A0F 0%, 
-        #1A0B2E 25%,
-        #0F0820 50%,
-        #1A0B2E 75%,
-        #0A0A0F 100%
-      );
-    animation: wildGradient 20s ease infinite;
-    background-size: 400% 400%;
+
+  /* Canvas weave — subtle woven texture for artwork surfaces. */
+  .canvas-tex::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    mix-blend-mode: multiply;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(23,19,16,0.06) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg, rgba(23,19,16,0.06) 0 1px, transparent 1px 3px);
   }
-  
-  @keyframes wildGradient {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+
+  /* Vignette scrim for legibility over video/imagery. */
+  .scrim-b {
+    background: linear-gradient(to top, rgba(23,19,16,0.72) 0%, rgba(23,19,16,0.28) 34%, rgba(23,19,16,0) 62%);
   }
-  
-  html[data-theme="wild"] .petal-shadow {
-    filter: drop-shadow(0 4px 12px rgba(182, 69, 214, 0.4)) 
-            drop-shadow(0 8px 24px rgba(255, 107, 157, 0.3))
-            drop-shadow(0 0 20px rgba(198, 255, 0, 0.2));
+  .scrim-full {
+    background: radial-gradient(ellipse at center, rgba(23,19,16,0.05) 0%, rgba(23,19,16,0.5) 100%);
   }
-  
-  html[data-theme="elegant"] .petal-shadow {
-    filter: drop-shadow(0 4px 8px rgba(122, 155, 118, 0.2)) 
-            drop-shadow(0 12px 24px rgba(122, 155, 118, 0.15));
-  }
-  
-  html:not([data-theme]) .petal-shadow {
-    filter: drop-shadow(0 4px 12px rgba(182, 69, 214, 0.4)) 
-            drop-shadow(0 8px 24px rgba(255, 107, 157, 0.3))
-            drop-shadow(0 0 20px rgba(198, 255, 0, 0.2));
-  }
-  
-  .wild-glow {
-    animation: wildPulse 3s ease-in-out infinite;
-  }
-  
-  @keyframes wildPulse {
-    0%, 100% { 
-      filter: brightness(1) saturate(1);
-    }
-    50% { 
-      filter: brightness(1.3) saturate(1.5);
-    }
-  }
+
+  /* Ground helpers so different areas can carry distinct atmospheres. */
+  .ground-soil { --ground: #241a12; --ink: #f4ead4; background-color: var(--ground); @apply text-cream; }
+  .ground-aged { --ground: #171310; --ink: #f4ead4; background-color: var(--ground); @apply text-cream; }
+  .ground-cream { --ground: #f4ead4; --ink: #241a12; background-color: var(--ground); @apply text-soil; }
+  .ground-clay { --ground: #b25a3b; --ink: #f8f2e4; background-color: var(--ground); @apply text-chalk; }
+  .ground-pine { --ground: #2c3a26; --ink: #f4ead4; background-color: var(--ground); @apply text-cream; }
 }
 
-/* Custom scrollbar - Theme based */
-html[data-theme="wild"] ::-webkit-scrollbar-track {
-  background: rgba(10, 10, 15, 0.8);
-}
+/* Custom scrollbar — earthy, quiet. */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: rgba(23,19,16,0.6); }
+::-webkit-scrollbar-thumb { background: rgba(122,92,60,0.7); border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(122,92,60,1); }
 
-html[data-theme="wild"] ::-webkit-scrollbar-thumb {
-  background: rgba(182, 69, 214, 0.5);
+/*
+  Reduced motion: honor the OS preference globally. Immersive sequences
+  provide their own richer reduced-motion fallbacks in-component, but this
+  neutralizes every incidental animation/transition as a safety net.
+*/
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
-
-html[data-theme="wild"] ::-webkit-scrollbar-thumb:hover {
-  background: rgba(182, 69, 214, 0.8);
-}
-
-html[data-theme="elegant"] ::-webkit-scrollbar-track {
-  background: rgba(251, 247, 240, 0.5);
-}
-
-html[data-theme="elegant"] ::-webkit-scrollbar-thumb {
-  background: rgba(122, 155, 118, 0.3);
-}
-
-html[data-theme="elegant"] ::-webkit-scrollbar-thumb:hover {
-  background: rgba(122, 155, 118, 0.5);
-}
-
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-thumb {
-  border-radius: 4px;
-}
-
-/* Cursor interactions */
-.bloom-cursor {
-  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%239B7BA3" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></svg>') 12 12, auto;
-}
-

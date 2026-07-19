@@ -1,155 +1,187 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
-
-const navItems = [
-  { name: 'The Bloom', href: '/', label: 'Home' },
-  { name: 'The Beds', href: '/gallery', label: 'Gallery' },
-  { name: 'The Compost', href: '/studio', label: 'Studio' },
-  { name: 'The Rain', href: '/music', label: 'Music' },
-  { name: 'The Roots', href: '/about', label: 'About' },
-];
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
+import { clsx } from "clsx";
+import { MAIN_NAV, SECONDARY_NAV, SITE } from "@/lib/site";
+import SoundToggle from "@/components/sound-toggle";
 
 export default function Navigation() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Close the mobile drawer on route change.
+  useEffect(() => setOpen(false), [pathname]);
+
+  const isActive = (href: string) =>
+    href === "/studio" ? pathname === href : pathname.startsWith(href);
 
   return (
     <>
-      <motion.nav
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled 
-            ? 'bg-garden-cream/95 backdrop-blur-md shadow-lg' 
-            : 'bg-transparent'
-        }`}
+      <header
+        className={clsx(
+          "fixed inset-x-0 top-0 z-50 transition-colors duration-500",
+          scrolled
+            ? "border-b border-cream/10 bg-soil/90 backdrop-blur-md"
+            : "bg-gradient-to-b from-soil/70 to-transparent"
+        )}
       >
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="group">
-              <motion.h1 
-                className="text-3xl md:text-4xl font-serif text-garden-moss"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 400 }}
-              >
-                The <span className="brush-text text-garden-violet">Garden</span>
-              </motion.h1>
-            </Link>
+        <nav
+          aria-label="Primary"
+          className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-3.5 md:px-8"
+        >
+          <Link href="/studio" className="group flex flex-col leading-none">
+            <span className="font-display text-2xl text-cream md:text-[1.7rem]">
+              {SITE.name}
+            </span>
+            <span className="kicker text-[0.55rem] text-cream/45 transition-colors group-hover:text-bloomgold">
+              Dan Dutton
+            </span>
+          </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-8">
-              {navItems.map((item) => {
-                const isActive = pathname === item.href;
-                return (
+          {/* Desktop main nav */}
+          <ul className="hidden items-center gap-7 lg:flex">
+            {MAIN_NAV.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <li key={item.href} className="relative">
                   <Link
-                    key={item.href}
                     href={item.href}
-                    className="relative group"
+                    className={clsx(
+                      "text-[0.82rem] uppercase tracking-[0.16em] transition-colors",
+                      active ? "text-bloomgold" : "text-cream/75 hover:text-cream"
+                    )}
                   >
+                    {item.label}
+                  </Link>
+                  {active && (
                     <motion.span
-                      className={`text-sm uppercase tracking-wider transition-colors ${
-                        isActive ? 'text-garden-violet' : 'text-garden-earth hover:text-garden-moss'
-                      }`}
-                      whileHover={{ y: -2 }}
+                      layoutId="nav-underline"
+                      className="absolute -bottom-1.5 left-0 right-0 h-px bg-bloomgold"
+                      transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                    />
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+
+          <div className="hidden items-center gap-5 lg:flex">
+            <SoundToggle />
+            <Link
+              href="/garden"
+              className="text-[0.7rem] uppercase tracking-label text-cream/55 transition-colors hover:text-cream"
+            >
+              Return to Garden
+            </Link>
+          </div>
+
+          {/* Mobile trigger */}
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            className="relative h-9 w-9 lg:hidden"
+          >
+            <span
+              className={clsx(
+                "absolute left-1.5 right-1.5 top-2.5 h-px bg-cream transition-transform duration-300",
+                open && "translate-y-2 rotate-45"
+              )}
+            />
+            <span
+              className={clsx(
+                "absolute left-1.5 right-1.5 top-4.5 h-px bg-cream transition-opacity duration-300",
+                open && "opacity-0"
+              )}
+            />
+            <span
+              className={clsx(
+                "absolute bottom-2.5 left-1.5 right-1.5 h-px bg-cream transition-transform duration-300",
+                open && "-translate-y-2 -rotate-45"
+              )}
+            />
+          </button>
+        </nav>
+      </header>
+
+      {/* Mobile drawer */}
+      <AnimatePresence>
+        {open && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setOpen(false)}
+              className="fixed inset-0 z-40 bg-aged/70 backdrop-blur-sm lg:hidden"
+            />
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", stiffness: 320, damping: 34 }}
+              className="grain fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col overflow-y-auto bg-loam px-8 pb-10 pt-24 lg:hidden"
+              role="dialog"
+              aria-label="Menu"
+            >
+              <ul className="flex flex-col">
+                {MAIN_NAV.map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      className="flex items-baseline justify-between border-b border-cream/10 py-4"
+                    >
+                      <span className="font-display text-3xl text-cream">
+                        {item.label}
+                      </span>
+                      {item.note && (
+                        <span className="font-hand text-lg text-bloomgold/80">
+                          {item.note}
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-3">
+                {SECONDARY_NAV.map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      className="text-sm uppercase tracking-label text-cream/70"
                     >
                       {item.label}
-                    </motion.span>
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeNav"
-                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-garden-violet"
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      />
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden relative w-10 h-10 focus:outline-none"
-              aria-label="Toggle menu"
-            >
-              <motion.span
-                animate={isOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
-                className="absolute left-0 top-2 w-full h-0.5 bg-garden-moss block"
-              />
-              <motion.span
-                animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
-                className="absolute left-0 top-1/2 w-full h-0.5 bg-garden-moss block"
-              />
-              <motion.span
-                animate={isOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
-                className="absolute left-0 bottom-2 w-full h-0.5 bg-garden-moss block"
-              />
-            </button>
-          </div>
-        </div>
-      </motion.nav>
-
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: '100%' }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: '100%' }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed inset-y-0 right-0 z-40 w-full max-w-sm bg-garden-cream shadow-2xl md:hidden"
-          >
-            <div className="flex flex-col h-full pt-24 px-8">
-              {navItems.map((item, index) => (
-                <motion.div
-                  key={item.href}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
+                    </Link>
+                  </li>
+                ))}
+                <li>
                   <Link
-                    href={item.href}
-                    onClick={() => setIsOpen(false)}
-                    className={`block py-4 text-2xl font-serif border-b border-garden-moss/20 ${
-                      pathname === item.href ? 'text-garden-violet' : 'text-garden-earth'
-                    }`}
+                    href="/garden"
+                    className="text-sm uppercase tracking-label text-cream/70"
                   >
-                    {item.name}
+                    Garden
                   </Link>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Overlay */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsOpen(false)}
-            className="fixed inset-0 bg-garden-midnight/50 backdrop-blur-sm z-30 md:hidden"
-          />
+                </li>
+              </ul>
+              <div className="mt-8">
+                <SoundToggle />
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>
   );
 }
-

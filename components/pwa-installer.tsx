@@ -1,85 +1,66 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
 export default function PWAInstaller() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [showPrompt, setShowPrompt] = useState(false);
+  const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
     const handler = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      // Show prompt after a delay
-      setTimeout(() => setShowPrompt(true), 3000);
+      setDeferred(e as BeforeInstallPromptEvent);
+      setTimeout(() => setShow(true), 6000);
     };
-
-    window.addEventListener('beforeinstallprompt', handler);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handler);
-    };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
 
-  const handleInstall = async () => {
-    if (!deferredPrompt) return;
-
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      console.log('User accepted the install prompt');
-    }
-    
-    setDeferredPrompt(null);
-    setShowPrompt(false);
-  };
-
-  const handleDismiss = () => {
-    setShowPrompt(false);
+  const install = async () => {
+    if (!deferred) return;
+    deferred.prompt();
+    await deferred.userChoice;
+    setDeferred(null);
+    setShow(false);
   };
 
   return (
     <AnimatePresence>
-      {showPrompt && deferredPrompt && (
+      {show && deferred && (
         <motion.div
-          initial={{ opacity: 0, y: 100 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 100 }}
-          transition={{ type: "spring", stiffness: 200, damping: 25 }}
-          className="fixed bottom-6 right-6 z-50 max-w-sm"
+          exit={{ opacity: 0, y: 40 }}
+          transition={{ type: "spring", stiffness: 220, damping: 26 }}
+          className="fixed bottom-5 right-5 z-[60] max-w-xs"
+          role="dialog"
+          aria-label="Install Dandyland"
         >
-          <div className="bg-garden-cream rounded-2xl shadow-2xl p-6 border-2 border-garden-moss/20">
-            <div className="flex items-start gap-4">
-              <div className="text-4xl">🌸</div>
-              <div className="flex-1">
-                <h3 className="font-serif text-xl text-garden-moss mb-2">
-                  Install The Garden
-                </h3>
-                <p className="text-garden-earth text-sm mb-4">
-                  Add this app to your home screen for a native app experience and offline access.
-                </p>
-                <div className="flex gap-3">
-                  <button
-                    onClick={handleInstall}
-                    className="px-4 py-2 rounded-lg bg-garden-moss text-garden-cream text-sm font-medium hover:bg-garden-moss/90 transition-colors"
-                  >
-                    Install
-                  </button>
-                  <button
-                    onClick={handleDismiss}
-                    className="px-4 py-2 rounded-lg bg-garden-earth/10 text-garden-earth text-sm font-medium hover:bg-garden-earth/20 transition-colors"
-                  >
-                    Not now
-                  </button>
-                </div>
-              </div>
+          <div className="grain rounded-sm border border-tobacco/50 bg-loam p-5 shadow-lift">
+            <p className="font-display text-2xl text-cream">Keep Dandyland close</p>
+            <p className="mt-2 text-sm text-cream/70">
+              Add it to your home screen — it opens straight into the studio, and
+              works even off the road.
+            </p>
+            <div className="mt-4 flex gap-3">
+              <button
+                onClick={install}
+                className="rounded-full bg-bloomgold px-4 py-2 text-sm font-medium text-soil transition-opacity hover:opacity-90"
+              >
+                Install
+              </button>
+              <button
+                onClick={() => setShow(false)}
+                className="rounded-full px-4 py-2 text-sm text-cream/60 transition-colors hover:text-cream"
+              >
+                Not now
+              </button>
             </div>
           </div>
         </motion.div>
@@ -87,4 +68,3 @@ export default function PWAInstaller() {
     </AnimatePresence>
   );
 }
-
