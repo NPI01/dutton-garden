@@ -5,6 +5,7 @@ import { SITE } from "@/lib/site";
 import { SoundProvider } from "@/contexts/sound-context";
 import SiteChrome from "@/components/site-chrome";
 import PWAInstaller from "@/components/pwa-installer";
+import AmbientAudio from "@/components/ambient-audio";
 import Script from "next/script";
 
 export const metadata: Metadata = {
@@ -51,6 +52,7 @@ export default function RootLayout({
         <SoundProvider>
           <SiteChrome>{children}</SiteChrome>
           <PWAInstaller />
+          <AmbientAudio />
         </SoundProvider>
         <Script
           id="register-sw"

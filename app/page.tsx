@@ -13,7 +13,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useSound } from "@/contexts/sound-context";
-import GateAudio from "@/components/gate-audio";
 
 export default function GatePage() {
   const reduceMotion = useReducedMotion();
@@ -59,9 +58,6 @@ export default function GatePage() {
       >
         <source src="/videos/dandyland-intro.mp4" type="video/mp4" />
       </video>
-
-      {/* Rotating ambient sound (off until the visitor turns it on). */}
-      <GateAudio />
 
       {/* Tonal treatment for legibility */}
       <div className="scrim-full pointer-events-none absolute inset-0" />
