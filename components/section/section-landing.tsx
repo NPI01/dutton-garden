@@ -18,13 +18,26 @@ const GROUND_CLASS: Record<Section["ground"], string> = {
  * A section landing page. Subsections are presented as alternating
  * editorial rows — image (or elegant placeholder) beside text — so the
  * page reads as a curated spread, never a uniform card grid.
+ *
+ * Pass `background` (e.g. a RotatingBackground) to hang the section over a
+ * moving backdrop; the page then uses the dark ground so text stays legible.
  */
-export default function SectionLanding({ section }: { section: Section }) {
+export default function SectionLanding({
+  section,
+  background,
+}: {
+  section: Section;
+  background?: React.ReactNode;
+}) {
+  const groundClass = background ? "ground-aged" : GROUND_CLASS[section.ground];
   return (
-    <div className={clsx(GROUND_CLASS[section.ground], "grain min-h-screen")}>
-      <PageHeader kicker={section.kicker} title={section.title} lede={section.lede} />
+    <div className={clsx(groundClass, "grain relative min-h-screen")}>
+      {background}
 
-      <div className="mx-auto max-w-5xl px-5 pb-28 md:px-8">
+      <div className="relative z-10">
+        <PageHeader kicker={section.kicker} title={section.title} lede={section.lede} />
+
+        <div className="mx-auto max-w-5xl px-5 pb-28 md:px-8">
         <ul className="flex flex-col gap-16 md:gap-24">
           {section.subsections.map((sub, i) => {
             const flip = i % 2 === 1;
@@ -88,6 +101,7 @@ export default function SectionLanding({ section }: { section: Section }) {
             );
           })}
         </ul>
+        </div>
       </div>
     </div>
   );

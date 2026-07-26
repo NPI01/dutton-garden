@@ -14,14 +14,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { FLOWERS, flowerSrc } from "@/lib/content/flowers";
-
-// Paintings that slowly rotate as the page background.
-const BG = [
-  flowerSrc("flowers 28.jpg"),
-  flowerSrc("flowers 46.jpg"),
-  flowerSrc("flowers 65.jpg"),
-];
+import { FLOWERS } from "@/lib/content/flowers";
+import RotatingBackground from "@/components/garden/rotating-background";
 
 // Handwritten fragments, shown as breaks between bands of framed flowers.
 const FRAGMENTS = [
@@ -66,7 +60,7 @@ export default function GardenWalk() {
 
   return (
     <div className="ground-aged relative min-h-screen">
-      <RotatingBackground reduce={!!reduce} />
+      <RotatingBackground />
 
       {/* Nav controls */}
       <div className="fixed inset-x-0 top-0 z-30 flex items-center justify-between px-5 py-5 md:px-8">
@@ -230,33 +224,3 @@ function Interlude({ text }: { text: string }) {
   );
 }
 
-/** Slowly rotating flower background, with a scrim for legibility. */
-function RotatingBackground({ reduce }: { reduce: boolean }) {
-  const [i, setI] = useState(0);
-
-  useEffect(() => {
-    if (reduce) return;
-    const t = setInterval(() => setI((v) => (v + 1) % BG.length), 7000);
-    return () => clearInterval(t);
-  }, [reduce]);
-
-  return (
-    <div className="fixed inset-0 z-0" aria-hidden="true">
-      {BG.map((src, idx) => (
-        <motion.div
-          key={src}
-          className="absolute inset-0"
-          initial={false}
-          animate={{ opacity: reduce ? (idx === 0 ? 1 : 0) : idx === i ? 1 : 0 }}
-          transition={{ duration: 2.5, ease: "easeInOut" }}
-        >
-          <Image src={src} alt="" fill sizes="100vw" className="object-cover" priority={idx === 0} />
-        </motion.div>
-      ))}
-      {/* Wash so the framed paintings and text stay legible, but the
-          rotating flowers still show clearly through behind the garden. */}
-      <div className="absolute inset-0 bg-aged/35" />
-      <div className="absolute inset-0 bg-gradient-to-b from-aged/25 via-aged/30 to-aged/55" />
-    </div>
-  );
-}
