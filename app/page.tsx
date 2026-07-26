@@ -10,14 +10,14 @@
  */
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useSound } from "@/contexts/sound-context";
+import GateAudio from "@/components/gate-audio";
 
 export default function GatePage() {
   const reduceMotion = useReducedMotion();
   const { soundOn, toggleSound } = useSound();
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   const [revealed, setRevealed] = useState(false);
   const [journeyed, setJourneyed] = useState(false);
@@ -41,22 +41,13 @@ export default function GatePage() {
     }
   }, []);
 
-  // Keep the video element's muted state in sync with the global preference.
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.muted = !soundOn;
-    if (soundOn) v.play().catch(() => {});
-  }, [soundOn]);
-
   return (
     <section
       aria-label="Dandyland — enter"
       className="relative h-[100svh] w-full overflow-hidden bg-aged"
     >
-      {/* The film */}
+      {/* The film — always muted; ambient sound comes from GateAudio. */}
       <video
-        ref={videoRef}
         className="absolute inset-0 h-full w-full object-cover"
         poster="/videos/poster.jpg"
         autoPlay
@@ -69,6 +60,9 @@ export default function GatePage() {
         <source src="/videos/dandyland-intro.mp4" type="video/mp4" />
       </video>
 
+      {/* Rotating ambient sound (off until the visitor turns it on). */}
+      <GateAudio />
+
       {/* Tonal treatment for legibility */}
       <div className="scrim-full pointer-events-none absolute inset-0" />
       <div className="scrim-b pointer-events-none absolute inset-x-0 bottom-0 h-2/3" />
@@ -79,11 +73,11 @@ export default function GatePage() {
           type="button"
           onClick={toggleSound}
           aria-pressed={soundOn}
-          className="inline-flex items-center gap-2 text-[0.7rem] uppercase tracking-label text-cream/70 transition-colors hover:text-cream"
+          className="inline-flex items-center gap-2 text-[0.7rem] uppercase tracking-label text-[#f5c63c]/85 transition-colors hover:text-[#f5c63c]"
         >
           <span
             className="inline-block h-1.5 w-1.5 rounded-full"
-            style={{ backgroundColor: soundOn ? "#e0a72e" : "transparent", boxShadow: soundOn ? "0 0 0 1px #e0a72e" : "0 0 0 1px rgba(244,234,212,0.5)" }}
+            style={{ backgroundColor: soundOn ? "#f5c63c" : "transparent", boxShadow: soundOn ? "0 0 0 1px #f5c63c" : "0 0 0 1px rgba(245,198,60,0.6)" }}
           />
           {soundOn ? "Sound on" : "Sound off"}
         </button>
@@ -93,8 +87,8 @@ export default function GatePage() {
           className={
             "text-[0.7rem] uppercase tracking-label transition-all duration-700 " +
             (journeyed
-              ? "text-cream/80 hover:text-bloomgold"
-              : "text-cream/45 hover:text-cream/80")
+              ? "text-[#f5c63c] hover:text-[#f5c63c]"
+              : "text-[#f5c63c]/60 hover:text-[#f5c63c]")
           }
         >
           Enter the Studio →
@@ -162,7 +156,7 @@ export default function GatePage() {
 
       {/* Corner mark */}
       <div className="pointer-events-none absolute bottom-5 left-5 z-20 md:left-8">
-        <span className="kicker text-cream/45">Dan Dutton · Kentucky</span>
+        <span className="kicker text-[#f5c63c]/75">Dan Dutton · Kentucky</span>
       </div>
     </section>
   );
