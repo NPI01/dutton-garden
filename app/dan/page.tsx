@@ -54,8 +54,8 @@ export default function DanPage() {
                 in 1990; the four-part dance-opera cycle{" "}
                 <em>The Secret Commonwealth</em>, broadcast by KET and nominated
                 for an Emmy; twelve monumental ballad paintings for 21c Museum;
-                ceramics for Rookwood; and, with Jesse Rivera, a sculpture studio
-                in the old carriage house.
+                ceramics for Rookwood; and a sculpture studio in the old
+                carriage house.
               </p>
               <p>
                 All of it comes from one place — the farm outside Somerset he

@@ -8,6 +8,7 @@
 
 import Link from "next/link";
 import { DOORWAYS } from "@/lib/content/studio";
+import JourneyPath from "@/components/studio/journey-path";
 
 export default function StudioHub() {
   return (
@@ -51,21 +52,32 @@ export default function StudioHub() {
       {/* Accessible wayfinding — the sections of the studio. */}
       <section className="mx-auto max-w-5xl px-5 py-24 md:px-8" aria-label="Find your way">
         <p className="kicker mb-8 text-cream/45">Find your way</p>
-        <ul className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-          {DOORWAYS.map((d) => (
-            <li key={d.id}>
-              <Link href={d.href} className="group block">
-                <span className="font-display text-2xl text-cream transition-colors group-hover:text-bloomgold group-focus-visible:text-bloomgold">
-                  {d.label}
-                </span>
-                <span className="mt-1 block font-hand text-lg text-cream/55">{d.note}</span>
-                <span className="mt-1 block text-[0.7rem] uppercase tracking-label text-cream/30">
-                  {d.object}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+
+        {/* The wayfinding list, with a dashed trail wandering between the
+            section names. The trail is measured from the live label
+            positions (see JourneyPath), so it follows the grid as it
+            reflows. */}
+        <div className="relative pt-6">
+          <JourneyPath />
+          <ul className="relative z-10 grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+            {DOORWAYS.map((d) => (
+              <li key={d.id}>
+                <Link href={d.href} className="group block">
+                  <span
+                    data-journey-node
+                    className="inline-block font-display text-2xl text-cream transition-colors group-hover:text-bloomgold group-focus-visible:text-bloomgold"
+                  >
+                    {d.label}
+                  </span>
+                  <span className="mt-1 block font-hand text-lg text-cream/55">{d.note}</span>
+                  <span className="mt-1 block text-[0.7rem] uppercase tracking-label text-cream/30">
+                    {d.object}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
     </div>
   );

@@ -20,8 +20,8 @@ export const ALMANAC: AlmanacEntry[] = [
     date: "2026-04-18",
     categories: ["Sculpture", "Animals"],
     excerpt:
-      "Jesse and I started the shell today. Iron wants to be a turtle more than you'd think.",
-    body: "Jesse and I started the shell today in the sculpture studio. Iron wants to be a turtle more than you'd think — you heat it, and it remembers curves. We argued about the plates for an hour and then agreed the argument was the design.",
+      "Started the shell today. Iron wants to be a turtle more than you'd think.",
+    body: "Started the shell today in the sculpture studio. Iron wants to be a turtle more than you'd think — you heat it, and it remembers curves. I argued with myself about the plates for an hour and then agreed the argument was the design.",
   },
   {
     slug: "learning-a-ballad-backward",

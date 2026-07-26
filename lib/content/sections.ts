@@ -178,8 +178,8 @@ export const SECTIONS: Record<string, Section> = {
     ground: "soil",
     subsections: [
       {
-        title: "Rivera–Dutton Studio",
-        blurb: "The collaboration with Jesse Rivera — finished sculpture, works in progress, fabrication, welding, models, and public commissions.",
+        title: "Clay & Iron",
+        blurb: "Finished sculpture, works in progress, fabrication, welding, models, and public commissions — what the fire and the forge make.",
         href: "/sculpture",
         image: "/art-images/sculpture-2.jpg",
         imageAlt: "A sculpture",
@@ -297,7 +297,7 @@ export const SECTIONS: Record<string, Section> = {
       },
       {
         title: "A Life in Making",
-        blurb: "An illustrated timeline: the family farm, first paintings and songs, museum exhibitions, the Speed Museum, a Congressional exhibition, The Stone Man, The Secret Commonwealth, Japan, Ballads of the Barefoot Mind, Rookwood, and Rivera–Dutton.",
+        blurb: "An illustrated timeline: the family farm, first paintings and songs, museum exhibitions, the Speed Museum, a Congressional exhibition, The Stone Man, The Secret Commonwealth, Japan, Ballads of the Barefoot Mind, Rookwood, and the sculpture studio.",
         href: "/dan",
         image: "/art-images/dan-retro-bio-pic.jpg",
         imageAlt: "Dan Dutton, earlier years",

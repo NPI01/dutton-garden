@@ -58,11 +58,11 @@ export const TIMELINE: TimelineEntry[] = [
   },
   {
     year: "A season away",
-    text: "Artist in residence for Rookwood Pottery, creating a new line of ceramics — and meeting Jesse Rivera, a metal worker and highly skilled welder.",
+    text: "Artist in residence for Rookwood Pottery, creating a new line of ceramics as they brought their work back to market.",
   },
   {
     year: "2016",
-    text: "Rivera–Dutton Sculpture Studio is founded in the 200-year-old carriage house. Their bronze turtles now line Turtle Bale Spring at Alys Beach, Florida.",
+    text: "The sculpture studio is founded in the 200-year-old carriage house — metalwork alongside the painting. Its bronze turtles now line Turtle Bale Spring at Alys Beach, Florida.",
   },
   {
     year: "Now",

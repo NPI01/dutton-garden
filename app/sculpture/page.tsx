@@ -20,8 +20,8 @@ export default function SculpturePage() {
           <section aria-label="Sculpture">
             <h2 className="font-display text-4xl text-cream md:text-5xl">Sculpture</h2>
             <p className="mt-3 max-w-xl text-pretty text-cream/70">
-              Metal and clay creatures, figures, and forms — many made with Jesse
-              Rivera at the Rivera–Dutton Studio.
+              Metal and clay creatures, figures, and forms — made in the
+              sculpture studio, in the old carriage house.
             </p>
             <div className="mt-8">
               <ArtGallery items={SCULPTURE} />

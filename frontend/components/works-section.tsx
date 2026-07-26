@@ -27,11 +27,11 @@ const works = [
     tags: ["Opera", "Premiere"],
   },
   {
-    title: "Rivera-Dutton Sculptures",
+    title: "Clay & Iron",
     category: "Sculpture Studio",
-    description: "Collaborative sculptural work with artist Jesse Rivera, held in private and museum collections.",
+    description: "Sculptural work in metal and clay, held in private and museum collections.",
     image: "/flower-images/flowers 19.jpg",
-    tags: ["Sculpture", "Collaboration"],
+    tags: ["Sculpture", "Metalwork"],
   },
   {
     title: "Congressional Rotunda Show",

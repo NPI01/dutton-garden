@@ -36,8 +36,8 @@ const timelineEvents = [
   },
   {
     year: "2016",
-    title: "Rivera-Dutton Sculpture Studio",
-    description: "Forms Rivera-Dutton Sculpture Studio with artist Jesse Rivera. Visual artwork collected by Brown-Forman, Berea College Art Museum, and 21c Museum.",
+    title: "The Sculpture Studio",
+    description: "Founds the sculpture studio in the old carriage house. Visual artwork collected by Brown-Forman, Berea College Art Museum, and 21c Museum.",
     side: "right",
   },
   {
