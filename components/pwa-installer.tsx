@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -9,6 +10,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export default function PWAInstaller() {
+  const pathname = usePathname();
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [show, setShow] = useState(false);
 
@@ -22,6 +24,9 @@ export default function PWAInstaller() {
     return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
 
+  // Only invite installation from the Studio hub — never elsewhere.
+  const onStudio = pathname === "/studio";
+
   const install = async () => {
     if (!deferred) return;
     deferred.prompt();
@@ -32,7 +37,7 @@ export default function PWAInstaller() {
 
   return (
     <AnimatePresence>
-      {show && deferred && (
+      {show && deferred && onStudio && (
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
